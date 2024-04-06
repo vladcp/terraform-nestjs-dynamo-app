@@ -1,0 +1,1 @@
+### Terraform AWS infrastructure for ECS deployment of NestJS + DynamoDB App

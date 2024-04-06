@@ -1,0 +1,6 @@
+.idea/
+.terraform/
+terraform.tfstate*
+.DS_Store
+.external_modules/
+.tflock
