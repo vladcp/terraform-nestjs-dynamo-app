@@ -1,7 +1,54 @@
-data "aws_iam_role" "ecs_task_execution_role" {
-  name = "ecsTaskExecutionRole"
+########  IAM ########  
+data "aws_iam_policy_document" "ecs_task_policy" {
+  statement {
+    actions = [
+      "dynamodb:GetItem",
+      "dynamodb:PutItem",
+      "dynamodb:UpdateItem",
+      "dynamodb:DeleteItem",
+      "dynamodb:Scan"
+    ]
+    resources = [aws_dynamodb_table.books_table.arn]
+  }
+  statement {
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:DescribeLogGroups",
+      "logs:PutLogEvents"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+  statement {
+    actions = [
+      "ecs:ExecuteCommand"
+    ]
+    resources = [
+      "*"
+    ]
+  }
 }
 
+data "aws_iam_policy_document" "ecs_assume_role_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["ecs-tasks.amazonaws.com"]
+    }
+  }
+}
+resource "aws_iam_role" "ecs_task_execution_role" {
+  name = "ecs_task_execution_role"
+  assume_role_policy = data.aws_iam_policy_document.ecs_assume_role_policy.json
+  inline_policy {
+    name = "ECSTaskExecutionPolicy"
+    policy = data.aws_iam_policy_document.ecs_task_policy.json
+  }
+}
+######## ECS ########  
 resource "aws_ecs_cluster" "app_cluster" {
   name = "nestjs-app-cluster"
   setting {
@@ -17,7 +64,7 @@ resource "aws_ecs_service" "nestjs_app" {
   launch_type = "FARGATE"
   desired_count = 1
   
-  enable_execute_command = false # for troubleshooting
+  enable_execute_command = true # for troubleshooting
   force_new_deployment = var.deploy
 
   load_balancer {
@@ -41,7 +88,7 @@ resource "aws_cloudwatch_log_group" "ecs_log_group" {
 resource "aws_ecs_task_definition" "nestjs_app" {
   family = "nestjs_app_task"
   container_definitions = jsonencode([{
-    name = "nestjs-app"
+    name = "nestjs_app_task"
     image = "docker.io/vladcp/nestjs-app:latest"
     essential = true
     portMappings = [
@@ -55,24 +102,29 @@ resource "aws_ecs_task_definition" "nestjs_app" {
       logDriver = "awslogs"
       options   = {
         "awslogs-group"         = "${aws_cloudwatch_log_group.ecs_log_group.name}"
-        "awslogs-region"        = "$`{var.aws_region}"
+        "awslogs-region"        = "${var.aws_region}"
         "awslogs-stream-prefix" = "ecs"
       }
     }
     memory = 512
-    cpu = 256
+    cpu = 256,
+    environment: [
+      {name: "NODE_ENV", value: var.environment },
+      {name: "TABLE_NAME", value: "${aws_dynamodb_table.books_table.id}"}
+    ]
   }])
 
   runtime_platform {
     operating_system_family = "LINUX"
-    cpu_architecture = "ARM64"
+    cpu_architecture = "X86_64"
   }
+
   cpu = 256
   memory = 512
   requires_compatibilities = ["FARGATE"]
   network_mode = "awsvpc"
-  execution_role_arn = data.aws_iam_role.ecs_task_execution_role.arn
-  task_role_arn = data.aws_iam_role.ecs_task_execution_role.arn
+  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn = aws_iam_role.ecs_task_execution_role.arn
 }
 
 ###### NETWORKING VPC ########

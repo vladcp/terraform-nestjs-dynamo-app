@@ -5,6 +5,7 @@ terraform {
       version = "4.45.0"
     }
   }
+  backend "s3" {}
 }
 provider "aws" {
   region = var.aws_region

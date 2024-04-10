@@ -5,13 +5,23 @@ variable "aws_region" {
 }
 
 variable "nestjs_container_port" {
+  description = "Port of the nestjs Docker container"
   type = number
   default = 3000
-  description = "Port of the nestjs Docker container"
 }
 
 variable "deploy" {
+  description = "Temporary value to enable/disable deploy features"
   type = bool
   default = false
-  description = "Temporary value to enable/disable deploy features"
+}
+
+variable "book_table_name" {
+  type = string
+  default = "book" 
+}
+
+variable "environment" {
+  description = "Environment Name"
+  type = string
 }
