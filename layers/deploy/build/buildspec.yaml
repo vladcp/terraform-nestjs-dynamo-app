@@ -1,0 +1,22 @@
+version: 0.2
+
+env:
+  variables:
+    TERRAFORM_VERSION: ${tf_version}
+
+phases:
+  pre_build:
+    commands:
+      - cd "$${CODEBUILD_SRC_DIR}/layers/${tf_deploy_layer}"
+      - terraform init -no-color --reconfigure --backend-config=../../config/${environment}/${tf_deploy_layer}/${tf_deploy_layer}.s3.tfbackend
+  build:
+    commands:
+      - cd "$${CODEBUILD_SRC_DIR}/layers/${tf_deploy_layer}"
+      - terraform plan -no-color --var-file=../../config/${environment}/${tf_deploy_layer}/default.tfvars -out=${tf_deploy_config}-${tf_deploy_layer}.tfplan
+      - terraform apply -no-color -auto-approve -compact-warnings ${tf_deploy_config}-${tf_deploy_layer}.tfplan
+artifacts:
+  files:
+    - "**/*"
+  name: codebuild-$AWS_REGION-$(date +%Y-%m-%d) 
+  discard-paths: no
+  base-directory: "$${CODEBUILD_SRC_DIR}"

@@ -22,6 +22,7 @@ variable "book_table_name" {
 }
 
 variable "environment" {
-  description = "Environment Name"
-  type = string
+  description = "Deployed environment identifier"
+  type        = string
+  default     = "dev"
 }
