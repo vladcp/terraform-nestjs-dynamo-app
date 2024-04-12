@@ -60,7 +60,7 @@ resource "aws_codebuild_project" "github_ecs_deploy_app" {
 
   environment {
     compute_type                = var.codebuild_node_size
-    image                       = var.codebuild_image
+    image                       = var.codebuild_tf_image
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
     privileged_mode             = true
@@ -78,7 +78,7 @@ resource "aws_codebuild_project" "github_ecs_deploy_app" {
     buildspec = templatefile("build/buildspec.yaml", {
       aws_account_id   = data.aws_caller_identity.current.account_id
       aws_region       = var.aws_region
-      environment      = var.environment
+      environment      = "sandbox8"
       tf_version       = var.terraform_version
       tf_deploy_config = "${var.environment}-${var.project_name}"
       tf_deploy_layer  = "app"
