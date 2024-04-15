@@ -73,4 +73,15 @@ resource "aws_codepipeline" "tf_codepipeline" {
       }
     }
   }
+  # trigger {
+  #   provider_type = "CodeStarSourceConnection"
+  #   git_configuration {
+  #     source_action_name = "${var.gh_org_name}-${var.app_gh_repo_name}"
+  #     push {
+  #       tags {
+  #         includes = [ var.environment ]
+  #       }
+  #     }
+  # }
+
 }

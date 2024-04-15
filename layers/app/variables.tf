@@ -13,7 +13,7 @@ variable "nestjs_container_port" {
 variable "deploy" {
   description = "Temporary value to enable/disable deploy features"
   type = bool
-  default = false
+  default = true
 }
 
 variable "book_table_name" {
