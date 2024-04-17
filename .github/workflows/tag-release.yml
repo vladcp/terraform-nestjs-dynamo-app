@@ -13,7 +13,10 @@ jobs:
 
     steps:
       - name: "Say a polite hello"
-        run: echo "$Greeting $First_Name, and welcome to the release tag actions script. :)"  
+        run: echo "$GREETING $FIRST_NAME, and welcome to the release tag actions script. :)"  
+        env:
+          GREETING: ${{ vars.GREETING }}
+          FIRST_NAME: ${{ vars.FIRST_NAME }}
 
       - name: Checkout main (or master)
         uses: actions/checkout@master
