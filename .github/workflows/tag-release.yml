@@ -5,6 +5,7 @@ on:
     inputs:
       tag:
         type: string
+        required: true
         description: New project release tag
 
 jobs:
@@ -23,4 +24,10 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
+
+      - name: Create tag
+        run: git tag ${{ inputs.tag }}
       
+      - name: Push tag
+        run: git push origin ${{ inputs.tag }}
+       
