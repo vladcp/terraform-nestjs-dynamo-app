@@ -11,7 +11,7 @@ terraform apply --var-file="../../config/sandbox8/base/default.tfvars"
 
 cd layers/app
 terraform init --reconfigure --backend-config="../../config/sandbox8/app/app.s3.tfbackend"
-terraform apply --var-file="../../config/sandbox8/app/default.tfvars"
+terraform apply --var-file="../../config/sandbox8/app/default.tfvars" --auto-approve
 
 
 cd layers/deploy
