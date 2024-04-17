@@ -1,0 +1,24 @@
+name: Edit release tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: string
+        description: New project release tag
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Say a polite hello"
+        run: echo "$Greeting $First_Name, and welcome to the release tag actions script. :)"  
+
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          path: main
+          persist-credentials: false
+          fetch-depth: 0
+      

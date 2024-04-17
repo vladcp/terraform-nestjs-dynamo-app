@@ -24,6 +24,7 @@ resource "aws_codepipeline" "tf_codepipeline" {
         ConnectionArn = data.aws_codestarconnections_connection.github_docker_build.arn
         FullRepositoryId = "${var.gh_org_name}/${var.tf_gh_repo_name}"
         BranchName = var.gh_branch
+        DetectChanges = false
       }
     }
     action {
@@ -31,7 +32,7 @@ resource "aws_codepipeline" "tf_codepipeline" {
       category = "Source"
       owner = "AWS"
       provider = "CodeStarSourceConnection"
-      version = "1"
+      version  = "1"
       output_artifacts = ["source_app_output"]
       region = var.aws_region
 
@@ -39,6 +40,7 @@ resource "aws_codepipeline" "tf_codepipeline" {
         ConnectionArn    = data.aws_codestarconnections_connection.github_docker_build.arn
         FullRepositoryId = "${var.gh_org_name}/${var.app_gh_repo_name}"
         BranchName       = var.gh_branch
+        DetectChanges    = false
       }
     }
   }
@@ -73,15 +75,23 @@ resource "aws_codepipeline" "tf_codepipeline" {
       }
     }
   }
-  # trigger {
-  #   provider_type = "CodeStarSourceConnection"
-  #   git_configuration {
-  #     source_action_name = "${var.gh_org_name}-${var.app_gh_repo_name}"
-  #     push {
-  #       tags {
-  #         includes = [ var.environment ]
-  #       }
-  #     }
+  # dynamic "trigger" {
+    # set this block depending on 
+  #  for_each = var.environment == "dev" ? ["apply"] : []
+  #  content {
+     
+  #  } 
   # }
-
+  
+  trigger {
+    provider_type = "CodeStarSourceConnection"
+    git_configuration {
+      source_action_name = "${var.gh_org_name}-${var.app_gh_repo_name}"
+      push {
+        tags {
+          includes = [ var.environment ]
+        }
+      }
+    }
+  }
 }
