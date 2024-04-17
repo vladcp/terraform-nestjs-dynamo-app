@@ -15,10 +15,9 @@ jobs:
       - name: "Say a polite hello"
         run: echo "$Greeting $First_Name, and welcome to the release tag actions script. :)"  
 
-      - name: Checkout main
-        uses: actions/checkout@v4
+      - name: Checkout main (or master)
+        uses: actions/checkout@master
         with:
-          path: main
           persist-credentials: false
           fetch-depth: 0
       
