@@ -20,9 +20,9 @@ jobs:
           FIRST_NAME: ${{ vars.FIRST_NAME }}
 
       - name: Checkout main (or master)
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
         with:
-          persist-credentials: false
+          ref: main
           fetch-depth: 0
 
       - name: Create tag
