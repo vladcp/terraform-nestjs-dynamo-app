@@ -5,6 +5,7 @@ on:
     inputs:
       tag:
         type: string
+        required: true
         description: New project release tag
 
 jobs:
@@ -13,12 +14,20 @@ jobs:
 
     steps:
       - name: "Say a polite hello"
-        run: echo "$Greeting $First_Name, and welcome to the release tag actions script. :)"  
+        run: echo "$GREETING $FIRST_NAME, and welcome to the release tag actions script. :)"  
+        env:
+          GREETING: ${{ vars.GREETING }}
+          FIRST_NAME: ${{ vars.FIRST_NAME }}
 
-      - name: Checkout main
+      - name: Checkout main (or master)
         uses: actions/checkout@v4
         with:
-          path: main
-          persist-credentials: false
+          ref: main
           fetch-depth: 0
+
+      - name: Create tag
+        run: git tag ${{ inputs.tag }}
       
+      - name: Push tag
+        run: git push origin ${{ inputs.tag }}
+       
