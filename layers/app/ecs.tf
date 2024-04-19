@@ -30,19 +30,9 @@ resource "aws_ecs_service" "nestjs_app" {
   }
 
   triggers = {
-    redeployment = data.docker_registry_image.app_image.sha256_digest
+    redeployment = plantimestamp()
   }
 }
-
-data "docker_registry_image" "app_image" {
-  name = var.app_docker_image
-}
-
-# resource "docker_image" "app_image" {
-#   name = data.docker_registry_image.app_image.name
-#   pull_triggers = [data.docker_registry_image.app_image.sha256_digest]
-#   keep_locally  = false
-# }
 
 resource "aws_cloudwatch_log_group" "ecs_log_group" {
   name              = "ecs_log_group"
@@ -53,7 +43,7 @@ resource "aws_ecs_task_definition" "nestjs_app" {
   family = "nestjs_app_task"
   container_definitions = jsonencode([{
     name = "nestjs_app_task"
-    image = "docker.io/vladcp/nestjs-app:latest"
+    image = var.app_docker_image
     essential = true
     portMappings = [
       {
