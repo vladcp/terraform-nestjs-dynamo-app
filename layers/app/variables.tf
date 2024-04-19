@@ -4,6 +4,12 @@ variable "aws_region" {
   default = "eu-west-2"
 }
 
+variable "app_docker_image" {
+  description = "Docker Image for the NestJS app"
+  type        = string
+  default     = "docker.io/vladcp/nestjs-app:latest"
+}
+
 variable "nestjs_container_port" {
   description = "Port of the nestjs Docker container"
   type = number
