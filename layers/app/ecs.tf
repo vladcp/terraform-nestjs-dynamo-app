@@ -38,11 +38,11 @@ data "docker_registry_image" "app_image" {
   name = var.app_docker_image
 }
 
-resource "docker_image" "app_image" {
-  name = data.docker_registry_image.app_image.name
-  pull_triggers = [data.docker_registry_image.app_image.sha256_digest]
-  keep_locally  = false
-}
+# resource "docker_image" "app_image" {
+#   name = data.docker_registry_image.app_image.name
+#   pull_triggers = [data.docker_registry_image.app_image.sha256_digest]
+#   keep_locally  = false
+# }
 
 resource "aws_cloudwatch_log_group" "ecs_log_group" {
   name              = "ecs_log_group"
