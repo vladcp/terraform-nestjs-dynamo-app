@@ -12,7 +12,7 @@ resource "aws_ecs_service" "nestjs_app" {
   cluster = aws_ecs_cluster.app_cluster.id
   task_definition = aws_ecs_task_definition.nestjs_app.arn
   launch_type = "FARGATE"
-  desired_count = 1
+  desired_count = 1 
   
   enable_execute_command = true # for troubleshooting
   force_new_deployment = var.deploy
@@ -28,6 +28,20 @@ resource "aws_ecs_service" "nestjs_app" {
     assign_public_ip = true
     security_groups = [aws_security_group.service_security_group.id]
   }
+
+  triggers = {
+    redeployment = data.docker_registry_image.app_image.sha256_digest
+  }
+}
+
+data "docker_registry_image" "app_image" {
+  name = var.app_docker_image
+}
+
+resource "docker_image" "app_image" {
+  name = data.docker_registry_image.app_image.name
+  pull_triggers = [data.docker_registry_image.app_image.sha256_digest]
+  keep_locally  = false
 }
 
 resource "aws_cloudwatch_log_group" "ecs_log_group" {
